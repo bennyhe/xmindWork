@@ -1,5 +1,8 @@
 <template>
-  <span class="mod-price" v-if="dataSource">
+  <span
+    class="mod-price"
+    v-if="dataSource !== null && dataSource !== undefined"
+  >
     <span class="mod-price__yen" v-if="showYen">&yen;</span>
     <span class="mod-price__num mod-price__num--big">{{ newPrice.value }}</span>
     <span class="mod-price__point" v-if="newPrice.digit">.</span>
