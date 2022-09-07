@@ -9,4 +9,21 @@ $mainColor: #11999e;
     border-bottom: 1px solid $mainColor;
     padding: 5px;
   }
+  &__content{
+    padding: 5px;
+  }
+}
+
+.page--list {
+  .row-incomes {
+    .col-amount {
+      color: darken(green, 5%)
+    }
+  }
+
+  .row-outgoings {
+    .col-amount {
+      color: darken(red, 5%)
+    }
+  }
 }

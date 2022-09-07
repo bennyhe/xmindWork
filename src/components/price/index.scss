@@ -1,0 +1,18 @@
+@use '../../style/mixin.scss';
+
+.mod-price {
+  &__yen {
+    font-family: airal;
+    margin-right: 2px;
+  }
+
+  &__point {
+    font-size: 12px;
+  }
+
+  &__num {
+    &--small {
+      font-size: 12px;
+    }
+  }
+}

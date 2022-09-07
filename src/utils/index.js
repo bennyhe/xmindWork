@@ -67,3 +67,24 @@ export function get(path, parent, num) {
   }
   return res
 }
+
+/**
+ * 分割价格
+ * @param {*} price 
+ * @param {*} small 
+ * @returns 
+ */
+export function splitPrice(price, pointSize = 2) {
+  price = Number(price).toFixed(pointSize)
+  if (price === 0) {
+    return {
+      value: 0,
+      digit: 0
+    }
+  }
+  const splitPirce = price.split('.')
+  return {
+    value: splitPirce[0],
+    digit: +splitPirce[1] ? splitPirce[1] : null
+  }
+}
