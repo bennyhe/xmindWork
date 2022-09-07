@@ -9,21 +9,26 @@ $mainColor: #11999e;
     border-bottom: 1px solid $mainColor;
     padding: 5px;
   }
-  &__content{
+
+  &__content {
     padding: 5px;
   }
 }
 
 .page--list {
+  .row-summary {
+    background-color: rgba($color: lighten($mainColor, 20%), $alpha: .1);
+  }
+
   .row-incomes {
     .col-amount {
-      color: darken(green, 5%)
+      color: darken(red, 5%)
     }
   }
 
   .row-outgoings {
     .col-amount {
-      color: darken(red, 5%)
+      color: darken(green, 5%)
     }
   }
 }

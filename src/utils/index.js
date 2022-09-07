@@ -88,3 +88,11 @@ export function splitPrice(price, pointSize = 2) {
     digit: +splitPirce[1] ? splitPirce[1] : null
   }
 }
+
+export function getDayOfTheMonthLastDay(datetime){
+  const ti = datetime instanceof Date ? datetime : new Date(datetime)
+  const thisYear = ti.getFullYear()
+  const month = ti.getMonth() + 1
+  const thisMonthDays = new Date(thisYear, month, 0)
+  return thisMonthDays.getTime() - 1
+}
