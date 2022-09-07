@@ -1,7 +1,7 @@
 <template>
   <div class="page page--list">
     <div class="page__title">
-      <h2>流水管理</h2>
+      <h2>账单管理</h2>
     </div>
     <div class="page__content">
       <ElDatePicker
@@ -11,7 +11,7 @@
         end-placeholder="结束月份"
       />
       <el-table
-      v-bind:key="tableKey"
+        v-bind:key="tableKey"
         :data="useBillsData"
         style="width: 100%"
         empty-text="暂无数据"
@@ -69,7 +69,7 @@ export default defineComponent({
     CptPrice
   },
   setup(props, context) {
-    const { ctx: that, proxy: ROOT } = getCurrentInstance()
+    const { proxy: ROOT } = getCurrentInstance()
     const categoriesData = ref([])
     const orgiBillsData = ref([])
     const billsDataAfterFilter = ref([])
@@ -86,6 +86,9 @@ export default defineComponent({
       }
     ])
 
+    /**
+     * 初始化数据
+     */
     const initData = async () => {
       const requestAll = [ROOT.$api.getCategories(), ROOT.$api.getBills()]
       return await Promise.all(requestAll)
@@ -97,7 +100,7 @@ export default defineComponent({
           }
           if (get('data', res[1], 1)) {
             // 数组至少长度为1
-            // 进行个排序处理
+            // 进行个时间排序处理
             const resSort = res[1].data.sort((a, b) => {
               return +a.time - +b.time
             })
@@ -113,8 +116,11 @@ export default defineComponent({
           })
         })
     }
-    initData()
+    initData() // 初始化数据
 
+    /**
+     * 表格显示关联的字段名称
+     */
     const getColoum = (type, id) => {
       if (type === 'type') {
         const res = billTypesData.value.find(sItem => +sItem.id === +id)
@@ -130,7 +136,9 @@ export default defineComponent({
       return id
     }
 
-    // 动态生成计算合计
+    /**
+     * 动态计算带合计的数据(用来显示)
+     */
     const useBillsData = computed(() => {
       if (billsDataAfterFilter.value.length > 0) {
         let incomes = 0,
@@ -174,7 +182,9 @@ export default defineComponent({
       }
       return billsDataAfterFilter.value
     })
-
+    /**
+     * 筛选符合时间段内的数据
+     */
     const filterDataFromTime = (startTime, stopTime) => {
       const res = orgiBillsData.value.filter(
         item => +item.time >= startTime && +item.time <= stopTime
@@ -182,16 +192,17 @@ export default defineComponent({
       billsDataAfterFilter.value = res
       // console.log('filter time res', res,  billsDataAfterFilter.value.map(item=>item.amount))
     }
+    // 监听月份筛选
     watch(pickMonth, val => {
       if (val) {
-        // console.log('时间筛选', val)
         const startTime = new Date(val[0]).getTime()
         const stopTime = getDayOfTheMonthLastDay(new Date(val[1]).getTime())
         filterDataFromTime(startTime, stopTime)
       } else {
+        // 不选择时间时还原全部数据
         billsDataAfterFilter.value = [...orgiBillsData.value]
       }
-      tableKey.value = Math.random()
+      tableKey.value = Math.random() // 用来解决elmentui在变更数据源时导致数据显示残留在表格里
     })
 
     return {
