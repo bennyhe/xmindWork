@@ -89,6 +89,11 @@ export function splitPrice(price, pointSize = 2) {
   }
 }
 
+/**
+ * 获取指定日期月尾最后一天最后一刻的时间
+ * @param {*} datetime 
+ * @returns 
+ */
 export function getDayOfTheMonthLastDay(datetime){
   const ti = datetime instanceof Date ? datetime : new Date(datetime)
   const thisYear = ti.getFullYear()

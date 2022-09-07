@@ -4,7 +4,7 @@ $mainColor: #11999e;
 
 .page {
   &__title {
-    font-size: 18px;
+    font-size: 22px;
     color: $mainColor;
     border-bottom: 1px solid $mainColor;
     padding: 5px;
@@ -13,6 +13,26 @@ $mainColor: #11999e;
   &__content {
     padding: 5px;
   }
+
+  &__btn-wrap {
+    padding: 5px;
+  }
+}
+
+.tb {
+  &-top {
+    position: relative;
+
+    &__extra {
+      position: absolute;
+      right: 5px;
+      top: 5px;
+    }
+  }
+}
+
+.summary-title {
+  text-align: right;
 }
 
 .page--list {
@@ -29,6 +49,15 @@ $mainColor: #11999e;
   .row-outgoings {
     .col-amount {
       color: darken(green, 5%)
+    }
+  }
+}
+
+
+@media screen and (max-width: 660px) {
+  .tb-top{
+    &__extra{
+      position: static;
     }
   }
 }
