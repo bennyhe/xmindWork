@@ -61,11 +61,11 @@ export default defineComponent({
     const billTypesData = ref([
       {
         id: 0,
-        name: '收入'
+        name: '支出'
       },
       {
         id: 1,
-        name: '支出'
+        name: '收入'
       }
     ])
 

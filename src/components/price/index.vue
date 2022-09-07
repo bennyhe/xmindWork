@@ -17,7 +17,7 @@ export default defineComponent({
   name: 'CptPrice',
   props: {
     dataSource: {
-      type: Number,
+      type: [Number, String],
       default: null
     },
     showYen: {
