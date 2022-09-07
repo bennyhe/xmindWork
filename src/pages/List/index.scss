@@ -1,0 +1,12 @@
+@use '../../style/mixin.scss';
+
+$mainColor: #11999e;
+
+.page {
+  &__title {
+    font-size: 18px;
+    color: $mainColor;
+    border-bottom: 1px solid $mainColor;
+    padding: 5px;
+  }
+}

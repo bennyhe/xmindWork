@@ -16,7 +16,6 @@ export default defineConfig({
       plugins: [
         autoprefixer({
           overrideBrowserslist: [
-            'ie >= 11',
             'Android >= 5',
             'iOS >= 9'
           ],
@@ -30,7 +29,6 @@ export default defineConfig({
     cros: true,
     open: true
   },
-  // base: 'digimon/',
   base: 'xmindWork/',
   resolve: {
   },
