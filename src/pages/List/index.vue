@@ -103,10 +103,10 @@
         <el-form-item label="分类" prop="cate">
           <el-select
             v-model="form.cate"
-            :placeholder="`请选择${+form.useType === 0 ? '支出' : '收入'}分类`"
+            :placeholder="`请选择${form.useType === '0' ? '支出' : '收入'}分类`"
           >
             <el-option
-              :label="cateItem.name"
+              :label="`${form.useType === '0' ? '支出' : '收入'}-${cateItem.name}`"
               :value="cateItem.id"
               v-for="cateItem in categoriesDataInForm[+form.useType]"
               v-bind:key="cateItem.id"
