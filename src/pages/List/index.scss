@@ -29,10 +29,22 @@ $mainColor: #11999e;
       top: 5px;
     }
   }
-}
 
-.summary-title {
-  text-align: right;
+  &-summary {
+    text-align: right;
+
+    .row-summary {
+      line-height: 32px;
+    }
+
+    .col-amount {
+      display: inline-block;
+      vertical-align: middle;
+      width: 150px;
+      margin-left: 10px;
+      text-align: left;
+    }
+  }
 }
 
 .page--list {
@@ -55,8 +67,8 @@ $mainColor: #11999e;
 
 
 @media screen and (max-width: 660px) {
-  .tb-top{
-    &__extra{
+  .tb-top {
+    &__extra {
       position: static;
     }
   }

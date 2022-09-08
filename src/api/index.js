@@ -42,7 +42,7 @@ const mApi = {
  */
   addBills: param => {
     param = param || {}
-    if (param.amount!=='' && param.time && param.category && param.type) {
+    if (param.amount !== '' && param.time && param.category && param.type) {
       return new Promise((resolve, reject) => {
         const res = {
           code: 1,

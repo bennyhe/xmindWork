@@ -5,12 +5,9 @@
  */
 export function tableRowClassName({ row }) {
   let cls = ''
-  if (row.spId === 'summary') {
-    cls += ' row-summary'
-  }
-  if (+row.type === 0 || (row.spId === 'summary' && row.valType === 'outgoings')) {
+  if (+row.type === 0) {
     cls += ' row-outgoings'
-  } else if (+row.type === 1 || (row.spId === 'summary' && row.valType === 'incomes')) {
+  } else if (+row.type === 1) {
     cls += ' row-incomes'
   }
   return cls

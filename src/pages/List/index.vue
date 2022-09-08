@@ -23,7 +23,7 @@
         </div>
         <el-table
           v-bind:key="tableKey"
-          :data="useBillsData"
+          :data="billsDataAfterFilter"
           style="width: 100%"
           empty-text="暂无数据"
           highlight-current-row
@@ -40,28 +40,47 @@
               {{ scope.row.type ? getColoum("type", scope.row.type) : "" }}
             </template>
           </el-table-column>
-          <el-table-column prop="category" label="分类">
+          <el-table-column
+            prop="category"
+            label="分类"
+            :filters="categoriesData"
+            :filter-method="fnFilterCate"
+          >
             <template #default="scope">
               {{
                 scope.row.category
                   ? getColoum("category", scope.row.category)
                   : ""
               }}
-              <div class="summary-title" v-if="scope.row.spId === 'summary'">
-                {{ scope.row.valTitle }}：
-              </div>
             </template>
           </el-table-column>
           <el-table-column
             prop="amount"
             label="金额"
             cell-class-name="col-amount"
+            sortable
           >
             <template #default="scope">
               <cptPrice :dataSource="scope.row.amount" />
             </template>
           </el-table-column>
         </el-table>
+        <div class="tb-summary">
+          <p
+            class="row-summary"
+            :class="{
+              'row-outgoings': row.valType === 'outgoings',
+              'row-incomes': row.valType === 'incomes',
+            }"
+            v-for="row in arrSummary"
+            v-bind:key="row.id"
+          >
+            {{ row.valTitle }}：
+            <span class="col-amount"
+              ><cptPrice :dataSource="row.amount"
+            /></span>
+          </p>
+        </div>
       </div>
       <p class="page__btn-wrap">
         <el-button type="primary" @click="handleClickChangeView()"
@@ -106,7 +125,9 @@
             :placeholder="`请选择${form.useType === '0' ? '支出' : '收入'}分类`"
           >
             <el-option
-              :label="`${form.useType === '0' ? '支出' : '收入'}-${cateItem.name}`"
+              :label="`${form.useType === '0' ? '支出' : '收入'}-${
+                cateItem.name
+              }`"
               :value="cateItem.id"
               v-for="cateItem in categoriesDataInForm[+form.useType]"
               v-bind:key="cateItem.id"
@@ -165,9 +186,6 @@ import {
   ElForm,
   ElFormItem,
   ElInput,
-  ElRadioGroup,
-  ElRadio,
-  ElSwitch,
   ElTimePicker,
   ElCol
 } from 'element-plus'
@@ -187,10 +205,11 @@ export default defineComponent({
     const categoriesData = ref([]) // 原始分类数据
     const categoriesDataInForm = ref([]) // 为了减少多次筛选记一笔的分类，一次性生成
     const orgiBillsData = ref([]) // 原始账单数据，接口获取&新增&筛选使用
-    const billsDataAfterFilter = ref([]) // 带合计的指定条件筛选后的数据
+    const billsDataAfterFilter = ref([]) // 指定条件筛选后的数据
     const pickMonth = ref(null) // 月份筛选
     const tableKey = ref(Math.random()) // eltable ID
-    const billTypesData = ref([ // 账单类型
+    const billTypesData = ref([
+      // 账单类型
       {
         id: '0',
         name: '支出'
@@ -201,6 +220,7 @@ export default defineComponent({
       }
     ])
     const isShowTableView = ref(true) // 切换页面状态
+    const arrSummary = ref([])
     // 表单相关变量
     const form = reactive({
       amount: '',
@@ -254,6 +274,9 @@ export default defineComponent({
             categoriesData.value = res[0].data
             const formCate = [[], []]
             res[0].data.forEach(item => {
+              // 表格筛选用
+              item.value = item.id
+              item.text = `${item.type === '0' ? '支出' : '收入'}-${item.name}`
               if (item.type === '0') {
                 formCate[0].push(item)
               } else if (item.type === '1') {
@@ -270,6 +293,7 @@ export default defineComponent({
             })
             orgiBillsData.value = [...resSort]
             billsDataAfterFilter.value = [...resSort]
+            getArrSummary()
           }
         })
         .catch(err => {
@@ -303,11 +327,33 @@ export default defineComponent({
     /**
      * 动态计算带合计的数据(用来显示)
      */
-    const useBillsData = computed(() => {
+    const getArrSummary = () => {
+      let incomes = 0,
+        outgoings = 0,
+        sum = 0
+      const newArr = [
+        {
+          spId: 'summary',
+          valTitle: '总收入',
+          valType: 'incomes',
+          amount: incomes,
+          id: Math.random()
+        },
+        {
+          spId: 'summary',
+          valTitle: '总支出',
+          valType: 'outgoings',
+          amount: outgoings,
+          id: Math.random()
+        },
+        {
+          spId: 'summary',
+          valTitle: '结余',
+          amount: sum,
+          id: Math.random()
+        }
+      ]
       if (billsDataAfterFilter.value.length > 0) {
-        let incomes = 0,
-          outgoings = 0,
-          sum = 0
         billsDataAfterFilter.value.forEach(item => {
           const curNumber = parseFloat(item.amount)
           if (!Number.isNaN(curNumber)) {
@@ -322,30 +368,15 @@ export default defineComponent({
           }
         })
         // console.log('触发计算', billsDataAfterFilter.value.map(item=>item.amount))
-        const newArr = [
-          ...billsDataAfterFilter.value,
-          {
-            spId: 'summary',
-            valTitle: '总收入',
-            valType: 'incomes',
-            amount: incomes
-          },
-          {
-            spId: 'summary',
-            valTitle: '总支出',
-            valType: 'outgoings',
-            amount: outgoings
-          },
-          {
-            spId: 'summary',
-            valTitle: '结余',
-            amount: sum
-          }
-        ]
-        return newArr
+        newArr[0].amount = incomes
+        newArr[1].amount = outgoings
+        newArr[2].amount = sum
+        newArr[0].id = Math.random()
+        newArr[1].id = Math.random()
+        newArr[2].id = Math.random()
       }
-      return billsDataAfterFilter.value
-    })
+      arrSummary.value = newArr
+    }
     /**
      * 筛选符合时间段内的数据
      */
@@ -366,6 +397,7 @@ export default defineComponent({
         // 不选择时间时还原全部数据
         billsDataAfterFilter.value = [...orgiBillsData.value]
       }
+      getArrSummary()
       tableKey.value = Math.random() // 用来解决elmentui在变更数据源时导致数据显示残留在表格里
     })
 
@@ -414,6 +446,7 @@ export default defineComponent({
               })
               orgiBillsData.value = resSort
               billsDataAfterFilter.value = resSort
+              getArrSummary()
               ElMessage({
                 message: '新增数据成功！',
                 type: 'success'
@@ -430,7 +463,7 @@ export default defineComponent({
               })
             })
         } else {
-          console.log('error submit!')
+          // console.log('error submit!')
           return false
         }
       })
@@ -444,6 +477,11 @@ export default defineComponent({
       form.useType = '0'
     }
 
+    const fnFilterCate = (value, row) => {
+      console.log(value, row)
+      return row.category === value
+    }
+
     return {
       formatTime,
       // el组件
@@ -452,9 +490,6 @@ export default defineComponent({
       ElForm,
       ElFormItem,
       ElInput,
-      ElRadioGroup,
-      ElRadio,
-      ElSwitch,
       ElTimePicker,
       ElCol,
       ArrowLeft,
@@ -465,7 +500,6 @@ export default defineComponent({
       tableRowClassName,
       tableCellClassName,
       pickMonth,
-      useBillsData,
       tableKey,
       handleClickChangeView,
       handleClickCloseView,
@@ -475,7 +509,11 @@ export default defineComponent({
       handleClickResetForm,
       ruleFormRef,
       rules,
-      categoriesDataInForm
+      categoriesDataInForm,
+      billsDataAfterFilter,
+      arrSummary,
+      // 表格操作
+      fnFilterCate
     }
   }
 })
