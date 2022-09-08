@@ -29,6 +29,7 @@
           highlight-current-row
           :row-class-name="tableRowClassName"
           :cell-class-name="tableCellClassName"
+          @filter-change="handleFilterChange"
         >
           <el-table-column prop="time" label="时间">
             <template #default="scope">
@@ -54,7 +55,12 @@
               }}
             </template>
           </el-table-column>
-          <el-table-column prop="amountFloat" label="金额" sortable :sort-by="['type', 'amountFloat', 'category']">
+          <el-table-column
+            prop="amountFloat"
+            label="金额"
+            sortable
+            :sort-by="['type', 'amountFloat', 'category']"
+          >
             <template #default="scope">
               <cptPrice
                 v-bind:key="`${scope.row.time}_${scope.row.amount}`"
@@ -241,7 +247,7 @@ export default defineComponent({
           if (!ruleFormRef.value) return
           const res = categoriesData.value.find(sitem => sitem.id === value)
           if (res && res.type !== form.useType) {
-            callback(new Error('该分类不属于该类型下！请重新选择！'))
+            callback(new Error('该分类不属于已选择类型下！请重新选择！'))
           }
         }
         callback()
@@ -321,7 +327,7 @@ export default defineComponent({
     /**
      * 动态计算带合计的数据(用来显示)
      */
-    const getArrSummary = () => {
+    const getArrSummary = useData => {
       let incomes = 0,
         outgoings = 0,
         sum = 0
@@ -347,8 +353,9 @@ export default defineComponent({
           id: Math.random()
         }
       ]
-      if (billsDataAfterFilter.value.length > 0) {
-        billsDataAfterFilter.value.forEach(item => {
+      useData = useData || billsDataAfterFilter.value
+      if (useData.length > 0) {
+        useData.forEach(item => {
           const curNumber = parseFloat(item.amount)
           if (!Number.isNaN(curNumber)) {
             if (item.type === '0') {
@@ -361,13 +368,10 @@ export default defineComponent({
             }
           }
         })
-        // console.log('触发计算', billsDataAfterFilter.value.map(item=>item.amount))
+        // console.log('触发计算', useData.map(item=>item.amount))
         newArr[0].amount = incomes
         newArr[1].amount = outgoings
         newArr[2].amount = sum
-        newArr[0].id = Math.random()
-        newArr[1].id = Math.random()
-        newArr[2].id = Math.random()
       }
       arrSummary.value = newArr
     }
@@ -477,13 +481,18 @@ export default defineComponent({
       form.useType = '0'
     }
 
+    const filterData = ref([])
     const fnFilterCate = (value, row) => {
-      console.log(value, row)
+      if (row.category === value) {
+        filterData.value.push(row)
+      }
       return row.category === value
     }
-
-    const handleSortAmount = (row, column) => {
-      console.log(row, column)
+    const handleFilterChange = val => {
+      getArrSummary(filterData.value.length > 0 ? filterData.value : null)
+      if (filterData.value.length > 0) {
+        filterData.value = []
+      }
     }
 
     return {
@@ -518,7 +527,7 @@ export default defineComponent({
       arrSummary,
       // 表格操作
       fnFilterCate,
-      handleSortAmount
+      handleFilterChange
     }
   }
 })
