@@ -54,7 +54,7 @@
               }}
             </template>
           </el-table-column>
-          <el-table-column prop="amountFloat" label="金额" sortable>
+          <el-table-column prop="amountFloat" label="金额" sortable :sort-by="['type', 'amountFloat', 'category']">
             <template #default="scope">
               <cptPrice
                 v-bind:key="`${scope.row.time}_${scope.row.amount}`"
