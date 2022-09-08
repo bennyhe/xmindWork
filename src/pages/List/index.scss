@@ -53,12 +53,16 @@ $mainColor: #11999e;
   }
 
   .row-incomes {
+
+    .col-amountFloat,
     .col-amount {
       color: darken(red, 5%)
     }
   }
 
   .row-outgoings {
+
+    .col-amountFloat,
     .col-amount {
       color: darken(green, 5%)
     }

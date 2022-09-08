@@ -54,18 +54,16 @@
               }}
             </template>
           </el-table-column>
-          <el-table-column
-            prop="amount"
-            label="金额"
-            cell-class-name="col-amount"
-            sortable
-          >
+          <el-table-column prop="amountFloat" label="金额" sortable>
             <template #default="scope">
-              <cptPrice :dataSource="scope.row.amount" />
+              <cptPrice
+                v-bind:key="`${scope.row.time}_${scope.row.amount}`"
+                :dataSource="scope.row.amount"
+              />
             </template>
           </el-table-column>
         </el-table>
-        <div class="tb-summary">
+        <div class="tb-summary" v-if="billsDataAfterFilter.length > 0">
           <p
             class="row-summary"
             :class="{
@@ -171,14 +169,7 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  getCurrentInstance,
-  ref,
-  watch,
-  computed,
-  reactive
-} from 'vue'
+import { defineComponent, getCurrentInstance, ref, watch, reactive } from 'vue'
 import {
   ElMessage,
   ElTable,
@@ -290,6 +281,9 @@ export default defineComponent({
             // 进行个时间排序处理
             const resSort = res[1].data.sort((a, b) => {
               return +a.time - +b.time
+            })
+            resSort.forEach(item => {
+              item.amountFloat = parseFloat(item.amount)
             })
             orgiBillsData.value = [...resSort]
             billsDataAfterFilter.value = [...resSort]
@@ -440,7 +434,13 @@ export default defineComponent({
           ROOT.$api
             .addBills(postData)
             .then(res => {
-              const newArr = [...orgiBillsData.value, postData]
+              const newArr = [
+                ...orgiBillsData.value,
+                {
+                  ...postData,
+                  amountFloat: parseFloat(postData.amount)
+                }
+              ]
               const resSort = newArr.sort((a, b) => {
                 return +a.time - +b.time
               })
@@ -482,6 +482,10 @@ export default defineComponent({
       return row.category === value
     }
 
+    const handleSortAmount = (row, column) => {
+      console.log(row, column)
+    }
+
     return {
       formatTime,
       // el组件
@@ -513,7 +517,8 @@ export default defineComponent({
       billsDataAfterFilter,
       arrSummary,
       // 表格操作
-      fnFilterCate
+      fnFilterCate,
+      handleSortAmount
     }
   }
 })
