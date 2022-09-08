@@ -36,6 +36,10 @@ $mainColor: #11999e;
     .row-summary {
       line-height: 32px;
     }
+    .row-incomes,
+    .row-outgoings{
+      border-bottom: 1px solid #d1d1d1;
+    }
 
     .col-amount {
       display: inline-block;

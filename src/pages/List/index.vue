@@ -70,7 +70,7 @@
           </el-table-column>
         </el-table>
         <div class="tb-summary" v-if="billsDataAfterFilter.length > 0">
-          <p
+          <div
             class="row-summary"
             :class="{
               'row-outgoings': row.valType === 'outgoings',
@@ -79,11 +79,19 @@
             v-for="row in arrSummary"
             v-bind:key="row.id"
           >
+            <template v-if="row.child && row.child.length > 0">
+              <p v-for="citem in row.child" v-bind:key="citem.id">
+                {{ `${row.valType === 'outgoings' ? '支出' : '收入'}-${getColoum("category", citem.category)}` }}：
+                <span class="col-amount"
+                  ><cptPrice :dataSource="citem.sum"
+                /></span>
+              </p>
+            </template>
             {{ row.valTitle }}：
             <span class="col-amount"
               ><cptPrice :dataSource="row.amount"
             /></span>
-          </p>
+          </div>
         </div>
       </div>
       <p class="page__btn-wrap">
@@ -337,14 +345,18 @@ export default defineComponent({
           valTitle: '总收入',
           valType: 'incomes',
           amount: incomes,
-          id: Math.random()
+          id: Math.random(),
+          child: [],
+          childKey: []
         },
         {
           spId: 'summary',
           valTitle: '总支出',
           valType: 'outgoings',
           amount: outgoings,
-          id: Math.random()
+          id: Math.random(),
+          child: [],
+          childKey: []
         },
         {
           spId: 'summary',
@@ -362,16 +374,56 @@ export default defineComponent({
               // 支出
               outgoings += curNumber
               sum -= curNumber
+              if (!newArr[1].childKey.includes(item.category)) {
+                newArr[1].child.push({
+                  category: item.category,
+                  sum: curNumber,
+                  id: Math.random()
+                })
+                newArr[1].childKey.push(item.category)
+              } else {
+                const resObject = newArr[1].child.find(
+                  sitem => sitem.category === item.category
+                )
+                if (resObject.category) {
+                  resObject.sum += curNumber
+                }
+              }
             } else {
               incomes += curNumber
               sum += curNumber
+              if (!newArr[0].childKey.includes(item.category)) {
+                newArr[0].child.push({
+                  category: item.category,
+                  sum: curNumber,
+                  id: Math.random()
+                })
+                newArr[0].childKey.push(item.category)
+              } else {
+                const resObject = newArr[0].child.find(
+                  sitem => sitem.category === item.category
+                )
+                if (resObject.category) {
+                  resObject.sum += curNumber
+                }
+              }
             }
           }
         })
-        // console.log('触发计算', useData.map(item=>item.amount))
         newArr[0].amount = incomes
         newArr[1].amount = outgoings
         newArr[2].amount = sum
+        if (newArr[0].child.length > 0) {
+          newArr[0].child.sort((a, b) => {
+            return a.sum - b.sum
+          })
+        }
+        if (newArr[1].child.length > 0) {
+          newArr[1].child.sort((a, b) => {
+            return a.sum - b.sum
+          })
+        }
+        console.log('触发计算', newArr)
       }
       arrSummary.value = newArr
     }
