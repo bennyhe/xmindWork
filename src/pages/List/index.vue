@@ -88,7 +88,7 @@
           >
         </el-form-item>
         <el-form-item label="金额" prop="amount">
-          <el-input v-model="form.amount" />
+          <el-input v-model="form.amount" placeholder="请输入金额"/>
         </el-form-item>
         <el-form-item label="类型">
           <el-radio-group v-model="form.useType">
@@ -373,6 +373,9 @@ export default defineComponent({
      */
     const handleClickChangeView = () => {
       isShowTable.value = false
+      form.amount = ''
+      form.useType = '0'
+      form.cate = ''
       form.date1 = new Date()
       form.date2 = new Date()
     }
@@ -437,6 +440,7 @@ export default defineComponent({
     const handleClickResetForm = formRef => {
       if (!formRef) return
       formRef.resetFields()
+      form.useType = '0'
     }
 
     return {
