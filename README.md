@@ -11,3 +11,12 @@ This template should help get you started developing with Vue 3 in Vite. The tem
 
 ## 引用插件
 1. [Element-Plus](https://element-plus.org/zh-CN/guide/installation.html#%E7%89%88%E6%9C%AC)
+
+## 运行环境要求
+1. node v14.15.0
+2. chrome v105
+
+## 如何运行
+在终端输入以下命令  
+1. npm install  
+2. npm run dev
