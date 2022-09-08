@@ -4,7 +4,7 @@
       <h2>账单管理</h2>
     </div>
     <!-- S 账单列表 -->
-    <div class="page__content" v-if="isShowTable">
+    <div class="page__content" v-if="isShowTableView">
       <div class="tb">
         <div class="tb-top">
           <p class="page__btn-wrap">
@@ -88,7 +88,7 @@
           >
         </el-form-item>
         <el-form-item label="金额" prop="amount">
-          <el-input v-model="form.amount" placeholder="请输入金额"/>
+          <el-input v-model="form.amount" placeholder="请输入金额" />
         </el-form-item>
         <el-form-item label="类型">
           <el-radio-group v-model="form.useType">
@@ -184,13 +184,13 @@ export default defineComponent({
   },
   setup(props, context) {
     const { proxy: ROOT } = getCurrentInstance()
-    const categoriesData = ref([])
-    const categoriesDataInForm = ref([])
-    const orgiBillsData = ref([])
-    const billsDataAfterFilter = ref([])
-    const pickMonth = ref(null)
-    const tableKey = ref(Math.random())
-    const billTypesData = ref([
+    const categoriesData = ref([]) // 原始分类数据
+    const categoriesDataInForm = ref([]) // 为了减少多次筛选记一笔的分类，一次性生成
+    const orgiBillsData = ref([]) // 原始账单数据，接口获取&新增&筛选使用
+    const billsDataAfterFilter = ref([]) // 带合计的指定条件筛选后的数据
+    const pickMonth = ref(null) // 月份筛选
+    const tableKey = ref(Math.random()) // eltable ID
+    const billTypesData = ref([ // 账单类型
       {
         id: '0',
         name: '支出'
@@ -200,7 +200,8 @@ export default defineComponent({
         name: '收入'
       }
     ])
-    const isShowTable = ref(true)
+    const isShowTableView = ref(true) // 切换页面状态
+    // 表单相关变量
     const form = reactive({
       amount: '',
       useType: '0',
@@ -372,7 +373,7 @@ export default defineComponent({
      * 记一笔
      */
     const handleClickChangeView = () => {
-      isShowTable.value = false
+      isShowTableView.value = false
       form.amount = ''
       form.useType = '0'
       form.cate = ''
@@ -383,7 +384,7 @@ export default defineComponent({
      * 关闭新增账单
      */
     const handleClickCloseView = () => {
-      isShowTable.value = true
+      isShowTableView.value = true
     }
     /**
      * 提交新增
@@ -418,7 +419,7 @@ export default defineComponent({
                 type: 'success'
               })
               // 跳回列表页
-              isShowTable.value = true
+              isShowTableView.value = true
               pickMonth.value = null
             })
             .catch(err => {
@@ -468,7 +469,7 @@ export default defineComponent({
       tableKey,
       handleClickChangeView,
       handleClickCloseView,
-      isShowTable,
+      isShowTableView,
       form,
       handleClickSubmitForm,
       handleClickResetForm,
